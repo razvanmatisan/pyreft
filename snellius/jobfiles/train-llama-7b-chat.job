@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --job-name=train
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=18
+#SBATCH --time=00:30:00
+#SBATCH --output=/home/rmatisan1/pyreft/logs/%A/slurm_output_%A.out
+#SBATCH --error=/home/rmatisan1/pyreft/logs/%A/slurm_output_%A.err
+
+module purge
+module load 2023
+module load Python/3.11.3-GCCcore-12.3.0
+
+cd $HOME/pyreft
+source .venv/bin/activate
+
+OUTPUT_DIR=$HOME/pyreft/logs/${SLURM_JOB_ID}
+
+# access token for HF login
+ACCESS_TOKEN_READ=XXXXXXX
+
+python train-llama2-chat.py \
+    --access_token_read $ACCESS_TOKEN_READ \
+    --layers "3,9,18,24" \
+    --low_rank_dimension 4 \
+    --output_dir $OUTPUT_DIR
